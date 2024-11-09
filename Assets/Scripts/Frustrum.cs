@@ -17,10 +17,22 @@ public class Frustrum : MonoBehaviour
     private float farAdjacent;
     private float finalFrustrumHeight;
 
+    private Camera mainCamera;
+
+    private void Start()
+    {
+        mainCamera = Camera.main;
+    }
+
     // Update is called once per frame
     private void OnDrawGizmos()
     {
-        Vector3 center = transform.position;
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
+        Vector3 center = mainCamera.transform.position;
 
         // Base screen triangle
         fovRadians = fovAngle * Mathf.PI / 180.0f;
