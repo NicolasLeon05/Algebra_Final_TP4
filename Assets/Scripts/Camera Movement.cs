@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float moveSpeed = 5f;       // Velocidad de movimiento hacia adelante y atrás
-    public float verticalSpeed = 3f;   // Velocidad de movimiento vertical (arriba/abajo)
+    public float moveSpeed = 50f;       // Velocidad de movimiento hacia adelante y atrás
+    public float verticalSpeed = 30f;   // Velocidad de movimiento vertical (arriba/abajo)
     public float rotationSpeed = 50f;  // Velocidad de rotación izquierda/derecha
 
     private void Update()
