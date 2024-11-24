@@ -19,9 +19,24 @@ public class FrustumCulling : MonoBehaviour
     private Camera mainCamera;
     private Plane[] frustumPlanes;
 
+
+    Vector3 nearCenter;
+    Vector3 farCenter;
+
+    Vector3 point1;
+    Vector3 point2;
+    Vector3 point3;
+    Vector3 point4;
+
+    Vector3 point5;
+    Vector3 point6;
+    Vector3 point7;
+    Vector3 point8;
+
     private void Start()
     {
         mainCamera = Camera.main;
+        CalculateFrustumPlanes();
     }
 
     private void Update()
@@ -46,27 +61,28 @@ public class FrustumCulling : MonoBehaviour
 
         finalFrustrumHeight = baseHeight * (farAdjacent / nearAdjacent);
 
-        Vector3 nearCenter = center + new Vector3(0, 0, nearAdjacent);
-        Vector3 farCenter = center + new Vector3(0, 0, drawingDistance);
+        nearCenter = mainCamera.transform.position + mainCamera.transform.forward * nearAdjacent;
+        farCenter = mainCamera.transform.position + mainCamera.transform.forward * drawingDistance;
 
-        Vector3 nearTopLeft = nearCenter + new Vector3(-baseWidth / 2, baseHeight / 2, 0);
-        Vector3 nearTopRight = nearCenter + new Vector3(baseWidth / 2, baseHeight / 2, 0);
-        Vector3 nearBottomLeft = nearCenter + new Vector3(-baseWidth / 2, -baseHeight / 2, 0);
-        Vector3 nearBottomRight = nearCenter + new Vector3(baseWidth / 2, -baseHeight / 2, 0);
+        point1 = nearCenter + mainCamera.transform.up * (baseHeight / 2) - mainCamera.transform.right * (baseWidth / 2);
+        point2 = nearCenter + mainCamera.transform.up * (baseHeight / 2) + mainCamera.transform.right * (baseWidth / 2);
+        point3 = nearCenter - mainCamera.transform.up * (baseHeight / 2) + mainCamera.transform.right * (baseWidth / 2);
+        point4 = nearCenter - mainCamera.transform.up * (baseHeight / 2) - mainCamera.transform.right * (baseWidth / 2);
 
-        Vector3 farTopLeft = farCenter + new Vector3(-farOpposite, finalFrustrumHeight / 2, 0);
-        Vector3 farTopRight = farCenter + new Vector3(farOpposite, finalFrustrumHeight / 2, 0);
-        Vector3 farBottomLeft = farCenter + new Vector3(-farOpposite, -finalFrustrumHeight / 2, 0);
-        Vector3 farBottomRight = farCenter + new Vector3(farOpposite, -finalFrustrumHeight / 2, 0);
+        point5 = farCenter + mainCamera.transform.up * (finalFrustrumHeight / 2) - mainCamera.transform.right * (farOpposite);
+        point6 = farCenter + mainCamera.transform.up * (finalFrustrumHeight / 2) + mainCamera.transform.right * (farOpposite);
+        point7 = farCenter - mainCamera.transform.up * (finalFrustrumHeight / 2) + mainCamera.transform.right * (farOpposite);
+        point8 = farCenter - mainCamera.transform.up * (finalFrustrumHeight / 2) - mainCamera.transform.right * (farOpposite);
 
         frustumPlanes = new Plane[6];
-        frustumPlanes[0] = new Plane(nearBottomLeft, nearBottomRight, nearTopLeft);  // Near
-        frustumPlanes[1] = new Plane(farBottomLeft, farTopLeft, farBottomRight);     // Far
-        frustumPlanes[2] = new Plane(nearBottomLeft, farBottomLeft, nearTopLeft);    // Left
-        frustumPlanes[3] = new Plane(nearBottomRight, nearTopRight, farBottomRight); // Right
-        frustumPlanes[4] = new Plane(nearTopLeft, nearTopRight, farTopLeft);         // Top
-        frustumPlanes[5] = new Plane(nearBottomLeft, farBottomRight, nearBottomRight); // Bottom
+        frustumPlanes[0] = new Plane(point4, point2, point1); //Near
+        frustumPlanes[1] = new Plane(point8, point5, point6); //Far
+        frustumPlanes[2] = new Plane(point4, point1, point5); //Left
+        frustumPlanes[3] = new Plane(point3, point6, point2); //Right
+        frustumPlanes[4] = new Plane(point1, point2, point5); //Top
+        frustumPlanes[5] = new Plane(point4, point8, point3); //Bottom
     }
+
 
     private void PerformFrustumCulling()
     {
@@ -75,17 +91,8 @@ public class FrustumCulling : MonoBehaviour
         foreach (MeshRenderer renderer in meshRenderers)
         {
             bool isVisible = IsObjectInFrustum(renderer);
-            renderer.gameObject.SetActive(isVisible);
-
-            // Debug para cada objeto
-            if (isVisible)
-            {
-                Debug.Log($"[VISIBLE] {renderer.gameObject.name}");
-            }
-            else
-            {
-                Debug.Log($"[INVISIBLE] {renderer.gameObject.name}");
-            }
+            //renderer.gameObject.SetActive(isVisible);
+            renderer.enabled = isVisible;
         }
     }
 
@@ -127,6 +134,7 @@ public class FrustumCulling : MonoBehaviour
                 return false;
             }
         }
+        Debug.Log($"Bounding box adentro del frustum");
         return true;
     }
 
@@ -139,6 +147,7 @@ public class FrustumCulling : MonoBehaviour
                 return false;
             }
         }
+        Debug.Log($"Vertice adentro del frustum");
         return true;
     }
 
@@ -164,20 +173,6 @@ public class FrustumCulling : MonoBehaviour
         // Frustrum height
         finalFrustrumHeight = baseHeight * (farAdjacent / nearAdjacent);
 
-
-        // Base screen measures
-        Vector3 baseTopLeft = center + new Vector3(-baseWidth / 2, baseHeight / 2, 0);
-        Vector3 baseTopRight = center + new Vector3(baseWidth / 2, baseHeight / 2, 0);
-        Vector3 baseBottomLeft = center + new Vector3(-baseWidth / 2, -baseHeight / 2, 0);
-        Vector3 baseBottomRight = center + new Vector3(baseWidth / 2, -baseHeight / 2, 0);
-
-        //  Frustrum measures
-        Vector3 farTopLeft = center + new Vector3(-farOpposite, finalFrustrumHeight / 2, drawingDistance);
-        Vector3 farTopRight = center + new Vector3(farOpposite, finalFrustrumHeight / 2, drawingDistance);
-        Vector3 farBottomLeft = center + new Vector3(-farOpposite, -finalFrustrumHeight / 2, drawingDistance);
-        Vector3 farBottomRight = center + new Vector3(farOpposite, -finalFrustrumHeight / 2, drawingDistance);
-
-
         //Drawing distance
         Vector3 ddVector = center + new Vector3(0, 0, drawingDistance);
         Vector3 missingDdVector = center + new Vector3(0, 0, -nearAdjacent);
@@ -186,24 +181,24 @@ public class FrustumCulling : MonoBehaviour
 
         //Base screen
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(baseTopLeft, baseTopRight);
-        Gizmos.DrawLine(baseTopRight, baseBottomRight);
-        Gizmos.DrawLine(baseBottomRight, baseBottomLeft);
-        Gizmos.DrawLine(baseBottomLeft, baseTopLeft);
+        Gizmos.DrawLine(point1, point2);
+        Gizmos.DrawLine(point2, point3);
+        Gizmos.DrawLine(point3, point4);
+        Gizmos.DrawLine(point4, point1);
 
         // Frustrum
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(farTopLeft, farTopRight);
-        Gizmos.DrawLine(farTopRight, farBottomRight);
-        Gizmos.DrawLine(farBottomRight, farBottomLeft);
-        Gizmos.DrawLine(farBottomLeft, farTopLeft);
+        Gizmos.DrawLine(point5, point6);
+        Gizmos.DrawLine(point6, point7);
+        Gizmos.DrawLine(point7, point8);
+        Gizmos.DrawLine(point8, point5);
 
         //Cone
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(baseTopLeft, farTopLeft);
-        Gizmos.DrawLine(baseTopRight, farTopRight);
-        Gizmos.DrawLine(baseBottomRight, farBottomRight);
-        Gizmos.DrawLine(baseBottomLeft, farBottomLeft);
+        Gizmos.DrawLine(point1, point5);
+        Gizmos.DrawLine(point2, point6);
+        Gizmos.DrawLine(point3, point7);
+        Gizmos.DrawLine(point4, point8);
 
         //Drawing distance
         Gizmos.color = Color.blue;
@@ -220,17 +215,5 @@ public class FrustumCulling : MonoBehaviour
         Gizmos.DrawLine(missingDdVector, bigFrustrumHalfWidth);
         Gizmos.DrawLine(ddVector, bigFrustrumHalfWidth);
 
-        CalculateFrustumPlanes();
-
-        if (frustumPlanes == null) return;
-
-        Gizmos.color = Color.yellow;
-        for (int i = 0; i < frustumPlanes.Length; i++)
-        {
-            Plane plane = frustumPlanes[i];
-            Vector3 planePosition = -plane.normal * plane.distance;
-            Gizmos.DrawSphere(planePosition, 0.3f);
-            Gizmos.DrawLine(Vector3.zero, plane.normal * 5f); // Debug normals
-        }
     }
 }
