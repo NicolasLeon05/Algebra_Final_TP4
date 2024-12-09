@@ -19,7 +19,6 @@ public class FrustumCulling : MonoBehaviour
     private Camera mainCamera;
     private Plane[] frustumPlanes;
 
-
     Vector3 nearCenter;
     Vector3 farCenter;
 
@@ -106,6 +105,7 @@ public class FrustumCulling : MonoBehaviour
         }
 
         Vector3[] vertices = renderer.GetComponent<MeshFilter>().sharedMesh.vertices;
+
         foreach (Vector3 vertex in vertices)
         {
             Vector3 worldVertex = renderer.transform.TransformPoint(vertex);

@@ -44,19 +44,21 @@ public class ManualBoundingBoxCalculator : MonoBehaviour
         }
     }
 
-    public Bounds GetBounds()
+    /*public Bounds GetBounds()
     {
         UpdateBoundingBox();
         return bounds;
     }
+    
 
     public List<Vector3> GetWorldVertices()
     {
         return new List<Vector3>(worldVertices);
     }
-
+   
     public void SetVisibility(bool isVisible)
     {
         gameObject.SetActive(isVisible);
     }
+     */
 }
