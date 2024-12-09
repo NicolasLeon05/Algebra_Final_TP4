@@ -122,14 +122,14 @@ public class FrustumCulling : MonoBehaviour
     private bool IsAABBInFrustum(Bounds bounds)
     {
         foreach (var plane in frustumPlanes)
-        {
-            Vector3 p = bounds.center + Vector3.Scale(bounds.extents, new Vector3(
+        {                                 //Mitad de cada eje (desde el centro a los bordes)  
+            Vector3 p = bounds.center + Vector3.Scale(bounds.extents, new Vector3( //P es el punto de la aabb mas cercano al plano
                 plane.normal.x > 0 ? 1 : -1,
                 plane.normal.y > 0 ? 1 : -1,
-                plane.normal.z > 0 ? 1 : -1
-            ));
+                plane.normal.z > 0 ? 1 : -1 
+            )); // La normal determina si tomamos el extremo positivo o negativo
 
-            if (plane.GetDistanceToPoint(p) < 0)
+            if (plane.GetDistanceToPoint(p) < 0) // Si es menor a 0, esta del lado contrario al que apunta la normal
             {
                 return false;
             }
@@ -199,21 +199,6 @@ public class FrustumCulling : MonoBehaviour
         Gizmos.DrawLine(point2, point6);
         Gizmos.DrawLine(point3, point7);
         Gizmos.DrawLine(point4, point8);
-
-        //Drawing distance
-        Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(center, 0.1f);
-        Gizmos.DrawLine(center, ddVector);
-
-        //Missing Drawing distance
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(center, missingDdVector);
-        Gizmos.DrawSphere(ddVector, 0.1f);
-
-        //Auxiliars
-        Gizmos.color = Color.white;
-        Gizmos.DrawLine(missingDdVector, bigFrustrumHalfWidth);
-        Gizmos.DrawLine(ddVector, bigFrustrumHalfWidth);
 
     }
 }
